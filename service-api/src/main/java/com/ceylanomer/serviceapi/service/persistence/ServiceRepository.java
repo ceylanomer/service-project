@@ -60,7 +60,7 @@ public class ServiceRepository {
         try {
             var serviceDoc = serviceMongoRepository.findById(id)
                     .orElseThrow(() -> new ServiceApiDataNotFoundException("common.client.noSuchElement"));
-            serviceDoc.setStatus(serviceDoc.getStatus());
+            serviceDoc.setStatus(Status.DELETED);
             serviceMongoRepository.save(serviceDoc);
         } finally {
             lock.writeLock().unlock();
