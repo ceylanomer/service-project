@@ -24,24 +24,28 @@ public class ServiceController extends BaseController {
 
     @GetMapping("/{id}")
     public Response<ServiceResponse> getById(@PathVariable String id) {
+        log.info("Fetching service with id: {}", id);
         ServiceAggregate serviceAggregate = queryBus.execute(GetServiceByIdQuery.builder().id(id).build());
         return respond(ServiceResponse.from(serviceAggregate));
     }
 
     @PostMapping
     public Response<ServiceResponse> create(@Valid @RequestBody ServiceRequest request) {
+        log.info("Creating new service with request: {}", request);
         ServiceAggregate response = commandBus.executeWithResponse(request.toCreateCommand());
         return respond(ServiceResponse.from(response));
     }
 
     @PutMapping("/{id}")
     public Response<ServiceResponse> update(@PathVariable String id, @Valid @RequestBody ServiceRequest request) {
+        log.info("Updating service with id: {} and request: {}", id, request);
         ServiceAggregate service = commandBus.executeWithResponse(request.toUpdateCommand(id));
         return respond(ServiceResponse.from(service));
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable String id) {
+        log.info("Deleting service with id: {}", id);
         commandBus.executeWithResponse(DeleteServiceCommand.builder().id(id).build());
         log.info("Service with id {} deleted successfully", id);
     }
