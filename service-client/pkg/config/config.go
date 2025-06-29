@@ -26,6 +26,8 @@ type AppConfig struct {
 }
 
 type DynamicConfigs struct {
+	NumberOfParallelRequests int `json:"numberOfParallelRequests"`
+	NumberOfSteps            int `json:"numberOfSteps"`
 }
 
 type Configuration struct {

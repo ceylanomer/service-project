@@ -1,10 +1,10 @@
 package response
 
-type CreateServiceResponse struct {
-	Data CreateServiceModel `json:"data"`
+type ServiceResponse struct {
+	Data ServiceResponseModel `json:"data"`
 }
 
-type CreateServiceModel struct {
+type ServiceResponseModel struct {
 	Id        string     `json:"id"`
 	Resources []Resource `json:"resources"`
 }

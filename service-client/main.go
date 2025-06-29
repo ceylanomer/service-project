@@ -34,7 +34,8 @@ func main() {
 	transport := clients.NewTransport()
 
 	serviceApiClient := clients.NewServiceApiClient(transport, cfg)
-	createServiceHandler := handlers.NewCreateServicesHandler(serviceApiClient, tracer)
+	createServiceHandler := handlers.NewCreateServiceHandler(serviceApiClient, tracer)
+	retrieveServiceBulkHandler := handlers.NewRetrieveServiceBulkHandler(serviceApiClient, tracer, cfg)
 
 	fiberApp := fiber.New(fiber.Config{
 		IdleTimeout:    5 * time.Second,
@@ -65,6 +66,7 @@ func main() {
 	api := fiberApp.Group("/api")
 	v1 := api.Group("/v1")
 	v1.Post("/services", handler.Handle(createServiceHandler, fiber.StatusCreated))
+	v1.Get("/services/batch", handler.Handle(retrieveServiceBulkHandler, fiber.StatusOK))
 
 	go func() {
 		serverAddr := fmt.Sprintf(":%d", cfg.AppConfig.Server.Port)

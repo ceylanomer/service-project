@@ -1,1 +1,4 @@
-{}
+{
+  "numberOfParallelRequests": 100,
+  "numberOfSteps": 10
+}

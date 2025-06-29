@@ -16,7 +16,8 @@ import (
 )
 
 type ServiceApiClient interface {
-	CreateServices(ctx context.Context, request *requests.CreateServiceRequest) (*response.CreateServiceResponse, error)
+	CreateService(ctx context.Context, request *requests.CreateServiceRequest) (*response.ServiceResponse, error)
+	RetrieveServiceById(ctx context.Context, serviceId string) (*response.ServiceResponse, error)
 }
 
 type serviceApiClient struct {
@@ -46,7 +47,7 @@ func NewServiceApiClient(transport *http.Transport, cfg *config.Configuration) S
 	}
 }
 
-func (c *serviceApiClient) CreateServices(ctx context.Context, request *requests.CreateServiceRequest) (*response.CreateServiceResponse, error) {
+func (c *serviceApiClient) CreateService(ctx context.Context, request *requests.CreateServiceRequest) (*response.ServiceResponse, error) {
 	zap.L().Info("Creating services", zap.Any("request", request))
 
 	body, err := json.Marshal(request)
@@ -82,7 +83,7 @@ func (c *serviceApiClient) CreateServices(ctx context.Context, request *requests
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusCreated || resp.StatusCode == http.StatusOK {
-		var createServiceResponse response.CreateServiceResponse
+		var createServiceResponse response.ServiceResponse
 		if err := json.NewDecoder(resp.Body).Decode(&createServiceResponse); err != nil {
 			zap.L().Error("Failed to decode response", zap.Error(err))
 			return nil, err
@@ -94,4 +95,45 @@ func (c *serviceApiClient) CreateServices(ctx context.Context, request *requests
 	zap.L().Error("Unexpected response status", zap.Int("status", resp.StatusCode))
 	return nil, fmt.Errorf("unexpected response status: %d", resp.StatusCode)
 
+}
+
+func (c *serviceApiClient) RetrieveServiceById(ctx context.Context, serviceId string) (*response.ServiceResponse, error) {
+	zap.L().Info("Retrieving service by ID", zap.String("serviceId", serviceId))
+
+	req, err := http.NewRequestWithContext(ctx,
+		http.MethodGet,
+		fmt.Sprintf("%s/api/services/%s", c.Configuration.AppConfig.ServiceApiClient.Host, serviceId),
+		nil)
+
+	if err != nil {
+		zap.L().Error("Failed to create new request", zap.Error(err))
+		return nil, err
+	}
+
+	retryableRequest, err := retryablehttp.FromRequest(req)
+	if err != nil {
+		zap.L().Error("Failed to create retryable request", zap.Error(err))
+		return nil, err
+	}
+
+	resp, err := c.Client.Do(retryableRequest)
+	if err != nil {
+		zap.L().Error("Failed to send request", zap.Error(err))
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusOK {
+		var serviceResponse response.ServiceResponse
+		if err := json.NewDecoder(resp.Body).Decode(&serviceResponse); err != nil {
+			zap.L().Error("Failed to decode response", zap.Error(err))
+			return nil, err
+		}
+		zap.L().Info("Service retrieved successfully", zap.Any("response", serviceResponse))
+		return &serviceResponse, nil
+	}
+
+	zap.L().Error("Unexpected response status", zap.Int("status", resp.StatusCode))
+	return nil, fmt.Errorf("unexpected response status: %d", resp.StatusCode)
 }
