@@ -19,7 +19,7 @@ public class UpdateServiceCommandHandler extends CommandHandler<UpdateServiceCom
     public ServiceAggregate handle(UpdateServiceCommand command) {
         var service = serviceRepository.retrieveServiceById(command.getId());
         service.updateResources(command.getResources());
-        service = serviceRepository.update(service);
+        serviceRepository.update(service);
         log.info("Service updated with id: {}", service.getId());
         return service;
     }
