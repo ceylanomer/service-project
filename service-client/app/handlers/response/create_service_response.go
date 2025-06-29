@@ -1,6 +1,11 @@
-package requests
+package response
 
-type CreateServiceRequest struct {
+type CreateServiceResponse struct {
+	Data CreateServiceModel `json:"data"`
+}
+
+type CreateServiceModel struct {
+	Id        string     `json:"id"`
 	Resources []Resource `json:"resources"`
 }
 

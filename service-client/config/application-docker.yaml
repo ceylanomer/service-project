@@ -1,12 +1,12 @@
 server:
-  host: "localhost"
+  host: "0.0.0.0"
   port: 8081
 serviceApiClient:
-  host: "http://localhost:8080"
+  host: "http://service-api:8080"  
   maxConnexions: 200
   timeout: 3s
   circuitBreaker:
-    name: service-api-client
+    name: "serviceApiClient"
     maxRequests: 10
     interval: 30s
     timeout: 10s

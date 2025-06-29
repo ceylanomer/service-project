@@ -20,12 +20,18 @@ func NewCreateServicesHandler(serviceApiClient clients.ServiceApiClient, tracer 
 	}
 }
 
-func (h *CreateServicesHandler) Handle(ctx context.Context, request *requests.CreateServiceRequest) (*response.AnyResponse, error) {
+func (h *CreateServicesHandler) Handle(ctx context.Context, request *requests.CreateServiceRequest) (*response.CreateServiceResponse, error) {
 	var span trace.Span
 	if h.tracer != nil {
 		ctx, span = h.tracer.Start(ctx, "CreateServicesHandler.Handle")
 		defer span.End()
 	}
-
-	return nil, nil
+	resp, err := h.serviceApiClient.CreateServices(ctx, request)
+	if err != nil {
+		if span != nil {
+			span.RecordError(err)
+		}
+		return nil, err
+	}
+	return resp, nil
 }
