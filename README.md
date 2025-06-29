@@ -40,13 +40,95 @@ REST API service for managing services with MongoDB persistence.
 #### Example Usage
 
 ```bash
-# Create service
-curl -X POST http://localhost:8080/api/services \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Test Service", "description": "A test service"}'
+# Post service
+curl --location 'http://localhost:8080/api/services' \
+--header 'Content-Type: application/json' \
+--data '{
+    "resources": [
+        {
+            "id": "resource_id_1",
+            "owners": [
+                {
+                    "id": "owner_id_1_1",
+                    "name": "Owner 1",
+                    "accountNumber": "AC001",
+                    "level": 1
+                },
+                {
+                    "id": "owner_id_1_2",
+                    "name": "Owner 2",
+                    "accountNumber": "AC002",
+                    "level": 2
+                }
+            ]
+        },
+        {
+            "id": "resource_id_2",
+            "owners": [
+                {
+                    "id": "owner_id_2_1",
+                    "name": "Owner 3",
+                    "accountNumber": "AC003",
+                    "level": 1
+                },
+                {
+                    "id": "owner_id_2_2",
+                    "name": "Owner 4",
+                    "accountNumber": "AC004",
+                    "level": 2
+                }
+            ]
+        }
+    ]
+}'
 
 # Get service by ID
-curl http://localhost:8080/api/services/{service-id}
+curl --location 'http://localhost:8080/api/services/{id}'
+
+# Put service by ID
+curl --location --request PUT 'http://localhost:8080/api/services/{id}' \
+--header 'Content-Type: application/json' \
+--data '{
+    "resources": [
+        {
+            "id": "resource_id_1",
+            "owners": [
+                {
+                    "id": "owner_id_1_1",
+                    "name": "Owner 1",
+                    "accountNumber": "AC001",
+                    "level": 1
+                },
+                {
+                    "id": "owner_id_1_2",
+                    "name": "Owner 2",
+                    "accountNumber": "AC002",
+                    "level": 2
+                }
+            ]
+        },
+        {
+            "id": "resource_id_2",
+            "owners": [
+                {
+                    "id": "owner_id_2_1",
+                    "name": "Owner 3",
+                    "accountNumber": "AC003",
+                    "level": 1
+                },
+                {
+                    "id": "owner_id_2_2",
+                    "name": "Owner 4",
+                    "accountNumber": "AC004",
+                    "level": 2
+                }
+            ]
+        }
+    ]
+}'
+
+# Delete service by ID
+curl --location --request DELETE 'http://localhost:8080/api/services/{id}'
 
 # Health check
 curl http://localhost:8080/actuator/health
